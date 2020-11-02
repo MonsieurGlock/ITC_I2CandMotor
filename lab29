@@ -7,8 +7,8 @@ void setup()
 }
 void loop()
 {
-  byte boi[4] = {255 , 127 , 63 , 31 };
   byte address, data, device , x;
+  byte cat[4];
   for (address = 1; address < 127; address++ ) // sets the value (range from 1 to 127)
   {
     Wire.beginTransmission(address); // transmit to address
@@ -24,10 +24,10 @@ void loop()
   Serial.print("\t pin state : In = "); // Print pin state
   Serial.print(x, BIN); // print as an ASCII-encoded binary);
   x = x & 0x0f;
-  if ((x & 2) != 2)
+  if ((x & 2) == 2 && (x & 1) == 1)
   {
     data = 0x80 | x;
-    for (i = 1 ; i <= 4; i++) // sets the value (range from 1 to 4)
+    for (i = 0 ; i < 4; i++) // sets the value (range from 1 to 4)
     {
       Wire.beginTransmission(device); // transmit to device
       Wire.write(data); // sends one byte
@@ -35,26 +35,23 @@ void loop()
       delay(5); // wait for stepper speed
       Serial.print("\n Out = "); // Print pin state
       Serial.print(data, BIN); // print as an ASCII-encoded binary);
+      cat[i] = data;
       data = data >> 1;
       data = data | x;
     }
   }
-  if ((x & 2) == 2)
+
+  if ((x & 1) != 1)
   {
-    data = 0x80 | x;
-    for (i = 1 ; i <= 4; i++) // sets the value (range from 1 to 4)
+    for (i = 3 ; i >= 0; i--) // sets the value (range from 1 to 4)
     {
       Wire.beginTransmission(device); // transmit to device
-      Wire.write(boi[i]); // sends one byte
+      Wire.write(cat[i]); // sends one byte
       Wire.endTransmission(); // stop transmitting
       delay(5); // wait for stepper speed
-      Serial.print("\n Out = "); // Print pin state
-      Serial.print(data, BIN); // print as an ASCII-encoded binary);
-      data = data >> 1;
-      data = data | x;
+
     }
   }
-  
 
 
 
